@@ -23,18 +23,23 @@ class BoardController:
     self.view.update_view()
 
     while finish_game != 2:
-      raw_input("")
+      # raw_input("")
       atual_color = self.atual_player.color
       print 'Jogador: ' + atual_color
+
       if self.board.valid_moves(atual_color).__len__() > 0:
         self.board.play(self.atual_player.play(self.board.get_clone()), atual_color)
-        self.view.update_view()
+        # self.view.update_view()
         finish_game = 0
       else:
-        print 'Sem movimentos para o jogador: ' + atual_color
+        # print 'Sem movimentos para o jogador: ' + atual_color
         finish_game += 1
+      
       self.atual_player = self._opponent(self.atual_player)
 
+    ##begin added
+    self.view.update_view()
+    ##end added
     self._end_game()
 
 
