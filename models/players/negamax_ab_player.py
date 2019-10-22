@@ -1,5 +1,7 @@
 class NegamaxABPlayer:
 
+  # Diferenca para o MinimaxABPlayer: usa o tamanho verdadeiro do valid_moves
+
   from operator import itemgetter
   from models.move import Move
   from timeit import default_timer as timer
@@ -34,14 +36,14 @@ class NegamaxABPlayer:
     return next_move
   
   def h_movimentos(self, board):
-    return len(board.valid_moves(self.color)) \
-           - len(board.valid_moves(board._opponent(self.color)))
+    return len(set(board.valid_moves(self.color))) \
+           - len(set(board.valid_moves(board._opponent(self.color))))
 
   def h_movimentos_precomputed(self, board, color, movecount):
     if color is self.color:
-      return movecount - len(board.valid_moves(board._opponent(self.color)))
+      return movecount - len(set(board.valid_moves(board._opponent(self.color))))
     else:
-      return len(board.valid_moves(self.color)) - movecount
+      return len(set(board.valid_moves(self.color))) - movecount
 
   def h_score(self, board):
     score = board.score()
@@ -55,8 +57,8 @@ class NegamaxABPlayer:
     player = node[1]
     moves = board.valid_moves(player)
     
-    if (len(moves) is 0):
-      if len(board.valid_moves(board._opponent(player))) != 0:
+    if (len(set(moves)) is 0):
+      if len(set(board.valid_moves(board._opponent(player)))) != 0:
         # Passa a vez
         otherTurn = self.negamax(-color, depth, -beta, -alpha, (board,board._opponent(player)))
         return (- otherTurn[0], otherTurn[1])
@@ -68,7 +70,7 @@ class NegamaxABPlayer:
       # folha! segue o jogo!
       return color * self.h_movimentos_precomputed(board, player, len(moves)), None
     else:
-      if len(moves) is 1:
+      if len(set(moves)) is 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1
@@ -88,4 +90,3 @@ class NegamaxABPlayer:
         if alpha >= beta: # corta! inutil continuar!
           break;
       return best
-        
