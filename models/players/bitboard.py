@@ -33,14 +33,14 @@ def next_down_left(x):
 def next_down_right(x):
   return (x >> (SIZE + ONE)) & BB_DOWN_RIGHT
 
-next_move_directions = [next_up,
+next_move_directions = (next_up,
          next_down,
          next_left,
          next_right,
          next_up_left,
          next_up_right,
          next_down_left,
-         next_down_right]
+         next_down_right)
 
 def bitcount(x):
   count = 0
@@ -65,7 +65,7 @@ def find_moves(bb):
   moves = i64(0)
   for next_dir in next_move_directions:
     candidates = op & next_dir(me)
-    while (candidates != ZERO):
+    while (candidates):
       moves     |= empty & next_dir(candidates)
       candidates = op    & next_dir(candidates)
   return moves
@@ -165,21 +165,18 @@ class BitBoard:
     return BitBoard(deepcopy(self.me), deepcopy(self.op))
 
   def play(self, move):
-    me = self.me
-    op = self.op
     empty = self.get_empty()
 
     for next_dir in next_move_directions:
       walk = next_dir(move)
       line = i64(0)
-      while (walk & op):
+      while (walk & self.op):
         line |= walk
         walk = next_dir(walk)
-      if (walk & me):
-        op &= ~line
-        me |= line
-    self.me = me | move
-    self.op = op
+      if (walk & self.me):
+        self.op &= ~line
+        self.me |= line
+    self.me |= move
 
     return self
 
@@ -206,10 +203,10 @@ def bb_from(board, color):
   n = i64(64)
   for i in range(1, 9):
     for j in range(1, 9):
-      n -= i64(1)
+      n -= ONE
       if (board.get_square_color(i,j) == color):
-        me |= i64(1) << n
+        me |= ONE << n
       elif (board.get_square_color(i,j) == color_op):
-        op |= i64(1) << n
+        op |= ONE << n
   
   return BitBoard(me, op)

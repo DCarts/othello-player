@@ -77,12 +77,7 @@ class MinimaxABPlayer:
         for move in moves:
           current = board.get_clone()
           current.play(move, player)
-          extra_depth = 0
-          if any(self.Move(*x) is move for x in self.corners):
-            # movimento perigoso
-            # aumenta 2 profundidade pra esse node filho
-            extra_depth = 2
-          best = max(best, (self.minimax(not isMaxNode, depth-1+extra_depth, alpha, beta, (current,board._opponent(player)))[0], move), key=self.itemgetter(0))
+          best = max(best, (self.minimax(not isMaxNode, depth-1, alpha, beta, (current,board._opponent(player)))[0], move), key=self.itemgetter(0))
           alpha = max(alpha, best[0])
           if best[0] >= beta: # corta! inutil pra mim!
             break
@@ -91,12 +86,7 @@ class MinimaxABPlayer:
         for move in moves:
           current = board.get_clone()
           current.play(move, player)
-          extra_depth = 0
-          if any(self.Move(*x) is move for x in self.corners):
-            # movimento perigoso
-            # aumenta 2 profundidade pra esse node filho
-            extra_depth = 2
-          best = min(best, (self.minimax(not isMaxNode, depth-1+extra_depth, alpha, beta, (current,board._opponent(player)))[0], move), key=self.itemgetter(0))
+          best = min(best, (self.minimax(not isMaxNode, depth-1, alpha, beta, (current,board._opponent(player)))[0], move), key=self.itemgetter(0))
           beta = min(beta, best[0])
           if best[0] <= alpha: # corta! inutil pra mim!
             break

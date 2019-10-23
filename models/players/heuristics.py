@@ -72,28 +72,6 @@ def h_potential_movements_est_2(bb):
   me_frontier, op_frontier = empty_nbors(bb)
   return fake_norm(op_frontier, me_frontier)
 
-
-def h_stability_3(bb): # fastest?
-  """ estabilidade de cada jogador
-  (isto e, nr. de pecas de cada jogador
-  que nao pode mais ser revertida )"""
-  occupied = bb.me | bb.op
-  me_stables = 0
-  op_stables = 0
-  
-  #stables
-  at = i64(1)
-  for k in range(64):
-    if at & occupied:
-      if (masks[at] & occupied) == occupied:
-        if at & bb.me:
-          me_stables += 1
-        else:
-          op_stables += 1
-    at <<= ONE
-  return fake_norm(me_stables, op_stables)
-
-
 def h_stability(bb):
   """ estabilidade de cada jogador
   (isto e, nr. de pecas de cada jogador
@@ -130,7 +108,7 @@ def h_stability(bb):
             walk = next_dir(walk)
           if (walk & bb.me):
             op_unstables_raw |= line
-      else:
+      elif at & op_moves_raw:
         for next_dir in next_move_directions:
           walk = next_dir(at)
           line = i64(0)
@@ -145,6 +123,73 @@ def h_stability(bb):
   op_unstables = bitcount(op_unstables_raw)
   return fake_norm(me_stables-me_unstables, op_stables-op_unstables)
 
+def h_stability_2(bb):
+  """ estabilidade de cada jogador
+  (isto e, nr. de pecas de cada jogador
+  que nao pode mais ser revertida )"""
+  occupied = bb.me | bb.op
+  
+  me_stables = 0
+  op_stables = 0
+  
+  me_moves_raw = find_moves(bb)
+  op_moves_raw = find_moves(bb.change_player_c())
+
+  raw_unstables = i64(0)
+  
+  #stables
+  at = i64(1)
+  for k in range(64):
+    if at & occupied:
+      if (masks[at] & occupied) == occupied:
+        if at & bb.me:
+          me_stables += 1
+        else:
+          op_stables += 1
+    #unstables
+    elif at & me_moves_raw:
+      for next_dir in next_move_directions:
+        walk = next_dir(at)
+        line = i64(0)
+        while (walk & bb.op):
+          line |= walk
+          walk = next_dir(walk)
+        if (walk & bb.me):
+          raw_unstables |= line
+    elif at & op_moves_raw:
+      for next_dir in next_move_directions:
+        walk = next_dir(at)
+        line = i64(0)
+        while (walk & bb.me):
+          line |= walk
+          walk = next_dir(walk)
+        if (walk & bb.op):
+          raw_unstables |= line
+    at <<= ONE
+
+  me_unstables = bitcount(raw_unstables | bb.me)
+  op_unstables = bitcount(raw_unstables | bb.op)
+  return fake_norm(me_stables-me_unstables, op_stables-op_unstables)
+
+def h_stability_no_unstables(bb): # fastest
+  """ estabilidade de cada jogador
+  (isto e, nr. de pecas de cada jogador
+  que nao pode mais ser revertida )"""
+  occupied = bb.me | bb.op
+  me_stables = 0
+  op_stables = 0
+  
+  #stables
+  at = i64(1)
+  for k in range(64):
+    if at & occupied:
+      if (masks[at] & occupied) == occupied:
+        if at & bb.me:
+          me_stables += 1
+        else:
+          op_stables += 1
+    at <<= ONE
+  return fake_norm(me_stables, op_stables)
 
 def h_stability_old(bb): # 20% mais lerda
   """ estabilidade de cada jogador
@@ -257,6 +302,19 @@ def h_evaluate_dynamic(bb):
   h1 = h_movements(bb)
   h2 = h_potential_movements_est(bb)
   h3 = h_stability(bb)
+  h4 = h_corners(bb)
+  h5 = h_score(bb)
+  values = h1, h2, h3, h4, h5
+  coeffs = [exp((move_count-k)*(move_count-k)/400) for k in splits]
+  val = sum(c * sum(v * w for v, w in zip(values, w)) for c,w in zip(coeffs,weights))
+  
+  return val
+  
+def h_evaluate_dynamic_no_uns(bb):
+  move_count = bitcount(bb.me | bb.op)
+  h1 = h_movements(bb)
+  h2 = h_potential_movements_est(bb)
+  h3 = h_stability_no_unstables(bb)
   h4 = h_corners(bb)
   h5 = h_score(bb)
   values = h1, h2, h3, h4, h5

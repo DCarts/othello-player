@@ -79,12 +79,8 @@ class NegamaxABPlayer:
         current = board.get_clone()
         current.play(move, player)
         extra_depth = 0
-        if any(self.Move(*x) is move for x in self.corners):
-          # movimento perigoso
-          # aumenta 2 profundidade pra esse node filho
-          extra_depth = 2
         best = max(best, (
-          -self.negamax(-color, depth-1 + extra_depth, -beta, -alpha, (current,board._opponent(player)))[0],
+          -self.negamax(-color, depth-1, -beta, -alpha, (current,board._opponent(player)))[0],
           move), key=self.itemgetter(0))
         alpha = max(alpha, best[0])
         if alpha >= beta: # corta! inutil continuar!

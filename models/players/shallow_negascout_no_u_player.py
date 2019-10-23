@@ -1,13 +1,15 @@
-class Dynamic_Iterative_Player:
+class Shallow_Negascout_Player_No_U:
   
   inf_pos = float("inf")
   inf_neg = -inf_pos
 
-  MAX_DEPTH = 12
+  MAX_DEPTH = 16
 
   ts_len = 0
   ts_mean = 0
   ts_max = 0
+
+  t_table = dict()
   
   def __init__(self, color):
     self.color = color
@@ -41,9 +43,9 @@ class Dynamic_Iterative_Player:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Dynamic Iterative last: ", last
-    print "Dynamic Iterative mean: ", self.ts_mean
-    print "Dynamic Iterative max: ", self.ts_max
+    print "Shallow negascout w/o uns. last: ", last
+    print "Shallow negascout w/o uns. mean: ", self.ts_mean
+    print "Shallow negascout w/o uns. max: ", self.ts_max
 
   def play(self, board):
     start = timer()
@@ -58,7 +60,7 @@ class Dynamic_Iterative_Player:
     while ((self.target - timer()) > 0.1 and depth < self.MAX_DEPTH):
       depth += 1
       before = timer()
-      self.last_cost, self.last_move = self.negamax(1, depth, self.inf_neg, self.inf_pos, bb)
+      self.last_cost, self.last_move = self.negascout(1, depth, self.inf_neg, self.inf_pos, bb)
       self.last_time = timer() - before
     print "reached depth ", depth
     next_move = Move(*bbm_to_tuple(self.last_move))
@@ -67,38 +69,61 @@ class Dynamic_Iterative_Player:
     return next_move
 
   
-  def negamax(self, color, depth, alpha, beta, node):
+  def negascout(self, color, depth, alpha, beta, node):
     if ((self.target - timer()) < 0.1):
       return self.last_cost, self.last_move # cabo o tempo
+    
+    from_t = self.t_table[node] if node in self.t_table else None
+    if from_t != None and from_t[2] >= depth: # vamos usar esse valor :)
+      return from_t[0], from_t[1]
+    
     moves = find_moves_iter(node)
     
-    if (len(moves) is 0):
+    if (len(moves) == 0):
       if len(find_moves_iter(node.change_player_c())) != 0:
         # Passa a vez
-        otherTurn = self.negamax(-color, depth, -beta, -alpha, node.change_player_c())
+        otherTurn = self.negascout(-color, depth, -beta, -alpha, node.change_player_c())
         return (- otherTurn[0], otherTurn[1])
       else:
         # folha! game over!
-        return h_score_final(node), None
+        score = h_score_final(node)
+        self.t_table[node] = score, None, depth
+        return score, None
     
-    if (depth is 0):
+    if (depth == 0):
       # folha! segue o jogo!
-      return h_evaluate_dynamic(node), None
+      score = h_evaluate_dynamic(node)
+      self.t_table[node] = score, None, depth
+      return h_evaluate_dynamic_no_uns(node), None
     else:
-      if len(moves) is 1:
+      if len(moves) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1
+
+      current_boards = [(node.fullplay_c(move), move) for move in moves]
+      current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depth // 2, -beta, -alpha, x[0])[0])
+      
+      last_best = current_boards[0][0]
       best = (self.inf_neg, moves[0])
-      for move in moves:
-        current = node.fullplay_c(move)
-        
-        best = max(best, (
-          -self.negamax(-color, depth-1, -beta, -alpha, current)[0],
-          move), key=itemgetter(0))
-        
+      for current, move in current_boards:
+        #extra_depth = 0
+        #if any(move == x for x in self.dangerous):
+          # movimento perigoso
+          # aumenta 2 profundidade pra esse node filho
+          #extra_depth = 2
+
+        if current == last_best:
+          score = -self.negascout(-color, depth-1, -beta, -alpha, current)[0], move
+        else:
+          score = -self.negascout(-color, depth-1, -alpha-1, -alpha, current)[0], move
+          if (alpha < score[0]) and (score[0] < beta):
+            score = -self.negascout(-color, depth-1, -beta, -score[0], current)[0], move
+
+        best = max(best, score, key=itemgetter(0))
         alpha = max(alpha, best[0])
         if alpha >= beta: # corta! inutil continuar!
           break;
+      self.t_table[node] = best[0], best[1], depth 
       return best
         

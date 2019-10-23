@@ -78,13 +78,8 @@ class Dynamic_Player:
       best = (self.inf_neg, moves[0])
       for move in moves:
         current = node.fullplay_c(move)
-        extra_depth = 0
-        if any(move is x for x in self.dangerous):
-          # movimento perigoso
-          # aumenta 2 profundidade pra esse node filho
-          extra_depth = 2
         best = max(best, (
-          -self.negamax(-color, depth-1 + extra_depth, -beta, -alpha, current)[0],
+          -self.negamax(-color, depth-1, -beta, -alpha, current)[0],
           move), key=itemgetter(0))
         alpha = max(alpha, best[0])
         if alpha >= beta: # corta! inutil continuar!
