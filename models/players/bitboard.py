@@ -1,20 +1,20 @@
-import numpy as np
+from numpy import uint64 as i64
 from copy import deepcopy
 from models.move import Move
 from models.board import Board
   
-ZERO = np.uint64(0)
-ONE = np.uint64(1)
-SIZE = np.uint64(8)
+ZERO = i64(0)
+ONE = i64(1)
+SIZE = i64(8)
 
-BB_UP = np.uint64(0xFFFFFFFFFFFFFF00)
-BB_DOWN = np.uint64(0x00FFFFFFFFFFFFFF)
-BB_LEFT = np.uint64(0xFEFEFEFEFEFEFEFE)
-BB_RIGHT = np.uint64(0x7F7F7F7F7F7F7F7F)
-BB_UP_LEFT = np.uint64(0xFEFEFEFEFEFEFE00)
-BB_UP_RIGHT = np.uint64(0x7F7F7F7F7F7F7F00)
-BB_DOWN_LEFT = np.uint64(0x00FEFEFEFEFEFEFE)
-BB_DOWN_RIGHT = np.uint64(0x007F7F7F7F7F7F7F)
+BB_UP = i64(0xFFFFFFFFFFFFFF00)
+BB_DOWN = i64(0x00FFFFFFFFFFFFFF)
+BB_LEFT = i64(0xFEFEFEFEFEFEFEFE)
+BB_RIGHT = i64(0x7F7F7F7F7F7F7F7F)
+BB_UP_LEFT = i64(0xFEFEFEFEFEFEFE00)
+BB_UP_RIGHT = i64(0x7F7F7F7F7F7F7F00)
+BB_DOWN_LEFT = i64(0x00FEFEFEFEFEFEFE)
+BB_DOWN_RIGHT = i64(0x007F7F7F7F7F7F7F)
 
 def next_up(x):
   return (x << SIZE) & BB_UP
@@ -42,36 +42,27 @@ next_move_directions = [next_up,
          next_down_left,
          next_down_right]
 
-def print_bbn(bbn):
-  mask = np.uint64(1) << np.uint64(63)
-  for i in range(8):
-    line = ""
-    for j in range(8):
-      line += ("1" if bbn & mask else "0")
-      mask >>= np.uint64(1)
-    print line
+def bitcount(x):
+  count = 0
+  while (x):
+    x &= (x-ONE)
+    count += 1
+  return count
 
-def print_pov(bb):
-  mask = np.uint64(1) << np.uint64(63)
-  for i in range(8):
-    line = ""
-    for j in range(8):
-      if (bb.me & mask):
-        line += 'M'
-      elif (bb.op & mask):
-        line += 'O'
-      else:
-        line += '.'
-      mask >>= np.uint64(1)
-    print line
+def empty_nbors(bb):
+  me_nbors = i64(0)
+  op_nbors = i64(0)
+  for direction in next_move_directions:
+    me_nbors |= (direction(bb.me) & empty)
+    op_nbors |= (direction(bb.op) & empty)
+  return me_nbors, op_nbors
 
 def find_moves(bb):
   me = bb.me
   op = bb.op
   empty = bb.get_empty()
   
-  moves = np.uint64(0)
-  candidates = op & (me << SIZE)
+  moves = i64(0)
   for next_dir in next_move_directions:
     candidates = op & next_dir(me)
     while (candidates != ZERO):
@@ -79,39 +70,39 @@ def find_moves(bb):
       candidates = op    & next_dir(candidates)
   return moves
 
-def find_moves_iter(bb):
-  moves_int = find_moves(bb)
-  moves = ()
-  while (moves_int):
-    without_lsb = moves_int & (moves_int-ONE)
-    moves += (moves_int - without_lsb,)
-    moves_int = without_lsb
-  return moves
+def bits_iter(bbn):
+  bits = ()
+  while (bbn):
+    without_lsb = bbn & (bbn-ONE)
+    bits += (bbn - without_lsb,)
+    bbn = without_lsb
+  return bits
 
-def convert_move(bbm):
+def find_moves_iter(bb):
+  return bits_iter(find_moves(bb))
+
+def bbm_to_tuple(bbm):
   i = 0
   j = 0
-  movel = np.uint64(bbm)
-  movec = np.uint64(bbm)
+  movel = i64(bbm)
+  movec = i64(bbm)
   while(movel):
     movel = next_up(movel)
     i += 1
   while(movec):
     movec = next_left(movec)
     j += 1
-  return Move(i, j)
+  return i, j
 
-def get_move(move):
-  bbm = np.uint64(1) << np.uint64(63)
-  x = np.uint64(move.x)
-  y = np.uint64(move.y)
-  bbm >>= (SIZE*(x-ONE))
+def tuple_to_bbm(move):
+  bbm = i64(1) << i64(63)
+  x = i64(move[0])
+  y = i64(move[1])
+  bbm >>= ((x-ONE) << 3) # x << 3 eh igual a x * 8
   bbm >>= (y-ONE)
   return bbm
 
-
-
-def fazBoard(bb):
+def makeBoard(bb):
   board = Board(None)
   moves_int_a = bb.me
   moves_a = ()
@@ -131,11 +122,41 @@ def fazBoard(bb):
     board.board[convert_move(move).x][convert_move(move).y] = board.WHITE
   return board
 
+def print_bbn(bbn):
+  mask = i64(1) << i64(63)
+  for i in range(8):
+    line = ""
+    for j in range(8):
+      line += ("1" if bbn & mask else "0")
+      mask >>= i64(1)
+    print line
+
+def print_pov(bb):
+  mask = i64(1) << i64(63)
+  for i in range(8):
+    line = ""
+    for j in range(8):
+      if (bb.me & mask):
+        line += 'M'
+      elif (bb.op & mask):
+        line += 'O'
+      else:
+        line += '.'
+      mask >>= i64(1)
+    print line
+
+
 class BitBoard:
 
   def __init__(self, me, op):
     self.me = me
     self.op = op
+
+  def __eq__(self, other):
+    return self.me == other.me and self.op == other.op
+
+  def __hash__(self):
+    return hash(self.me | self.op)
 
   def get_empty(self):
     return ~(self.me | self.op)
@@ -150,7 +171,7 @@ class BitBoard:
 
     for next_dir in next_move_directions:
       walk = next_dir(move)
-      line = np.uint64(0)
+      line = i64(0)
       while (walk & op):
         line |= walk
         walk = next_dir(walk)
@@ -177,18 +198,18 @@ class BitBoard:
   
 
 def bb_from(board, color):
-  me = np.uint64(0)
-  op = np.uint64(0)
+  me = i64(0)
+  op = i64(0)
   
   color_op = board._opponent(color)
   
-  n = np.uint64(64)
+  n = i64(64)
   for i in range(1, 9):
     for j in range(1, 9):
-      n -= np.uint64(1)
-      if (board.get_square_color(i,j) is color):
-        me |= np.uint64(1) << n
-      elif (board.get_square_color(i,j) is color_op):
-        op |= np.uint64(1) << n
+      n -= i64(1)
+      if (board.get_square_color(i,j) == color):
+        me |= i64(1) << n
+      elif (board.get_square_color(i,j) == color_op):
+        op |= i64(1) << n
   
   return BitBoard(me, op)

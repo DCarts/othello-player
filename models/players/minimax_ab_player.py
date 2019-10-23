@@ -30,7 +30,7 @@ class MinimaxABPlayer:
     self.corners = [x for x in self.all_corners if board.get_square_color(*x) == board.EMPTY]
     next_move = self.minimax(True, self.MAX_DEPTH, self.inf_neg, self.inf_pos, (board,self.color))[1]
     end = self.timer()
-    self.update_time(end - start)
+    # self.update_time(end - start)
     return next_move
       
   def h_movimentos(self, board):

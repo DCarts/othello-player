@@ -1,9 +1,9 @@
-class Negamax_AB_BB_Player:
+class Dynamic_Player:
   
   inf_pos = float("inf")
   inf_neg = -inf_pos
 
-  MAX_DEPTH = 4
+  MAX_DEPTH = 3
 
   ts_len = 0
   ts_mean = 0
@@ -12,10 +12,14 @@ class Negamax_AB_BB_Player:
   def __init__(self, color):
     self.color = color
     self.fixImports()
-    self.all_corners = (ONE << i64(63), # top left
-                        ONE << i64(56), # top right
-                        ONE << i64(7),  # lower left
-                        ONE)            # lower right
+    self.dangerous = (ONE << i64(63), # top left
+                      ONE << i64(56), # top right
+                      ONE << i64(7),  # lower left
+                      ONE,            # lower right
+                      ONE << i64(54),
+                      ONE << i64(49),
+                      ONE << i64(14),
+                      ONE << i64(9))     
     
   def fixImports(self):
     bb_globals = {}
@@ -37,9 +41,9 @@ class Negamax_AB_BB_Player:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "NegaMax Alpha-Beta with BitBoard last: ", last
-    print "NegaMax Alpha-Beta with BitBoard mean: ", self.ts_mean
-    print "NegaMax Alpha-Beta with BitBoard max: ", self.ts_max
+    print "Dynamic last: ", last
+    print "Dynamic mean: ", self.ts_mean
+    print "Dynamic max: ", self.ts_max
 
   def play(self, board):
     start = timer()
@@ -65,7 +69,7 @@ class Negamax_AB_BB_Player:
     
     if (depth is 0):
       # folha! segue o jogo!
-      return h_evaluate(node), None
+      return h_evaluate_dynamic(node), None
     else:
       if len(moves) is 1:
         # movimento forcado
@@ -75,7 +79,7 @@ class Negamax_AB_BB_Player:
       for move in moves:
         current = node.fullplay_c(move)
         extra_depth = 0
-        if any(move is x for x in self.all_corners):
+        if any(move is x for x in self.dangerous):
           # movimento perigoso
           # aumenta 2 profundidade pra esse node filho
           extra_depth = 2
@@ -86,4 +90,3 @@ class Negamax_AB_BB_Player:
         if alpha >= beta: # corta! inutil continuar!
           break;
       return best
-        
