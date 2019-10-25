@@ -40,14 +40,14 @@ class NegamaxABPlayer:
            - len(set(board.valid_moves(board._opponent(self.color))))
 
   def h_movimentos_precomputed(self, board, color, movecount):
-    if color is self.color:
+    if color == self.color:
       return movecount - len(set(board.valid_moves(board._opponent(self.color))))
     else:
       return len(set(board.valid_moves(self.color))) - movecount
 
   def h_score(self, board):
     score = board.score()
-    if self.color is board.WHITE:
+    if self.color == board.WHITE:
       return self.inf_pos if score[0] > score[1] else self.inf_neg
     else:
       return self.inf_pos if score[1] > score[0] else self.inf_neg
@@ -57,7 +57,7 @@ class NegamaxABPlayer:
     player = node[1]
     moves = board.valid_moves(player)
     
-    if (len(set(moves)) is 0):
+    if (len(set(moves)) == 0):
       if len(set(board.valid_moves(board._opponent(player)))) != 0:
         # Passa a vez
         otherTurn = self.negamax(-color, depth, -beta, -alpha, (board,board._opponent(player)))
@@ -66,11 +66,11 @@ class NegamaxABPlayer:
         # folha! game over!
         return color * self.h_score(board), None
     
-    if (depth is 0):
+    if (depth == 0):
       # folha! segue o jogo!
       return color * self.h_movimentos_precomputed(board, player, len(moves)), None
     else:
-      if len(set(moves)) is 1:
+      if len(set(moves)) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1

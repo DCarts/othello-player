@@ -6,9 +6,9 @@ import cProfile
 
 controller = BoardController()
 # controller.init_game()
-cProfile.run('controller.init_game()', 'pstats')
-p = pstats.Stats('pstats')
 def doit():
+  p = pstats.Stats('pstats')
   p.sort_stats('cumulative').print_stats(30)
   p.sort_stats('time').print_stats(100)
+cProfile.run('controller.init_game()', 'pstats')
 print 'doit!'

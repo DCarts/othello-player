@@ -18,7 +18,7 @@ class NegamaxPlayer:
 
   def h_score(self, board):
     score = board.score()
-    if self.color is board.WHITE:
+    if self.color == board.WHITE:
       return self.inf_pos if score[0] > score[1] else self.inf_neg
     else:
       return self.inf_pos if score[1] > score[0] else self.inf_neg
@@ -28,14 +28,14 @@ class NegamaxPlayer:
     player = node[1]
     moves = board.valid_moves(player)
     
-    if (depth is 0):
+    if (depth == 0):
       if len(moves) != 0:
         return color * self.h_movimentos(board), None
       if len(board.valid_moves(board._opponent(player))) != 0:
         return color * self.h_movimentos(board), None
       return color * self.h_score(board), None
 
-    elif (len(moves) is 0):
+    elif (len(moves) == 0):
       if len(board.valid_moves(board._opponent(player))) != 0:
         # Passa a vez
         otherTurn = self.negamax(-color, depth, (board,board._opponent(player)))

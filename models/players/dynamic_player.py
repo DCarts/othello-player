@@ -58,7 +58,7 @@ class Dynamic_Player:
   def negamax(self, color, depth, alpha, beta, node):
     moves = find_moves_iter(node)
     
-    if (len(moves) is 0):
+    if (len(moves) == 0):
       if len(find_moves_iter(node.change_player_c())) != 0:
         # Passa a vez
         otherTurn = self.negamax(-color, depth, -beta, -alpha, node.change_player_c())
@@ -67,11 +67,11 @@ class Dynamic_Player:
         # folha! game over!
         return h_score_final(node), None
     
-    if (depth is 0):
+    if (depth == 0):
       # folha! segue o jogo!
       return h_evaluate_dynamic(node), None
     else:
-      if len(moves) is 1:
+      if len(moves) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1

@@ -43,7 +43,7 @@ next_move_directions = (next_up,
          next_down_right)
 
 def bitcount(x):
-  count = 0
+  count = 0.0
   while (x):
     x &= (x-ONE)
     count += 1
@@ -71,10 +71,10 @@ def find_moves(bb):
   return moves
 
 def bits_iter(bbn):
-  bits = ()
+  bits = []
   while (bbn):
     without_lsb = bbn & (bbn-ONE)
-    bits += (bbn - without_lsb,)
+    bits.append(bbn - without_lsb)
     bbn = without_lsb
   return bits
 
@@ -149,8 +149,8 @@ def print_pov(bb):
 class BitBoard:
 
   def __init__(self, me, op):
-    self.me = me
-    self.op = op
+    self.me = i64(me)
+    self.op = i64(op)
 
   def __eq__(self, other):
     return self.me == other.me and self.op == other.op

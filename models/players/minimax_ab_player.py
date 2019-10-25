@@ -37,7 +37,7 @@ class MinimaxABPlayer:
     return len(board.valid_moves(self.color)) - len(board.valid_moves(board._opponent(self.color)))
 
   def h_movimentos_precomputed(self, board, color, movecount):
-    if color is self.color:
+    if color == self.color:
       return movecount - len(board.valid_moves(board._opponent(self.color)))
     else:
       return len(board.valid_moves(self.color)) - movecount
@@ -45,7 +45,7 @@ class MinimaxABPlayer:
 
   def h_score(self, board):
     score = board.score()
-    if self.color is board.WHITE:
+    if self.color == board.WHITE:
       return self.inf_pos if score[0] > score[1] else self.inf_neg
     else:
       return self.inf_pos if score[1] > score[0] else self.inf_neg
@@ -55,19 +55,19 @@ class MinimaxABPlayer:
     player = node[1]
     moves = board.valid_moves(player)
 
-    if (len(moves) is 0):
+    if (len(moves) == 0):
       if len(board.valid_moves(board._opponent(player))) != 0:
         # Passa a vez ( e de bonus desce 1 nivel a mais )
         return self.minimax(not isMaxNode, depth, alpha, beta, (board,board._opponent(player)))
       else:
         # folha! game over!
         return self.h_score(board), None
-    elif (depth is 0):
+    elif (depth == 0):
       # folha! segue o jogo!
       return self.h_movimentos_precomputed(board, player, len(moves)), None
     
     else:
-      if len(moves) is 1:
+      if len(moves) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1

@@ -50,6 +50,7 @@ class Iterative_Negascout_Player:
   def play(self, board):
     start = timer()
     self.target = start+3
+    self.overtime = False
     
     bb = bb_from(board, self.color)
     bbmove = None
@@ -57,11 +58,23 @@ class Iterative_Negascout_Player:
     self.last_time = 0
     self.last_cost, self.last_move = None, None
     depth = 0
-    while ((self.target - timer()) > 0.1 and depth < self.MAX_DEPTH):
+    while (depth < self.MAX_DEPTH):
       depth += 1
       before = timer()
-      self.last_cost, self.last_move = self.negascout(1, depth, self.inf_neg, self.inf_pos, bb)
+      cost, move = self.negascout(1, depth, self.inf_neg, self.inf_pos, bb)
+      if self.overtime:
+        depth -= 1
+        break
+      self.last_cost, self.last_move = cost, move
       self.last_time = timer() - before
+      if abs(cost) > 9999: # endgame
+        if cost > 0:
+          print 'ganhei'
+        elif cost < 0:
+          print 'perdi'
+        else:
+          print 'empatei'
+        break 
     print "reached depth ", depth
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
@@ -70,38 +83,40 @@ class Iterative_Negascout_Player:
 
   def negascout(self, color, depth, alpha, beta, node):
     if ((self.target - timer()) < 0.1):
-      return self.last_cost, self.last_move # cabo o tempo
+      self.overtime = True
+      return 0, None # cabo o tempo
     
     from_t = self.t_table[node] if node in self.t_table else None
     if from_t != None and from_t[2] >= depth: # vamos usar esse valor :)
-      return from_t[0], from_t[1]
+      return color*from_t[0], from_t[1]
     
-    moves = find_moves_iter(node)
+    moves_raw = find_moves(node)
     
-    if (len(moves) == 0):
-      if len(find_moves_iter(node.change_player_c())) != 0:
+    if (not moves_raw):
+      if find_moves(node.change_player_c()):
         # Passa a vez
         otherTurn = self.negascout(-color, depth, -beta, -alpha, node.change_player_c())
         return (- otherTurn[0], otherTurn[1])
       else:
         # folha! game over!
         score = h_score_final(node)
-        self.t_table[node] = score, None, depth
+        self.t_table[node] = color*score, None, depth
         return score, None
     
     if (depth == 0):
       # folha! segue o jogo!
       score = h_evaluate_dynamic(node)
-      self.t_table[node] = score, None, depth
+      self.t_table[node] = color*score, None, depth
       return h_evaluate_dynamic(node), None
     else:
+      moves = bits_iter(moves_raw)
       if len(moves) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1
 
       current_boards = [(node.fullplay_c(move), move) for move in moves]
-      current_boards.sort(reverse = True, key = lambda x: (self.t_table[x[0]][0] if x[0] in self.t_table else 0))
+      # current_boards.sort(reverse = True, key = lambda x: (self.t_table[x[0]][0] if x[0] in self.t_table else 0))
       
       last_best = current_boards[0][0]
       best = (self.inf_neg, moves[0])
@@ -123,6 +138,10 @@ class Iterative_Negascout_Player:
         alpha = max(alpha, best[0])
         if alpha >= beta: # corta! inutil continuar!
           break;
-      self.t_table[node] = best[0], best[1], depth
-      return best
+        
+      if self.overtime:
+        return 0, None
+      else:
+        self.t_table[node] = color*best[0], best[1], depth 
+        return best
         

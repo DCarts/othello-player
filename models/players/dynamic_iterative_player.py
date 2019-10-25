@@ -3,7 +3,7 @@ class Dynamic_Iterative_Player:
   inf_pos = float("inf")
   inf_neg = -inf_pos
 
-  MAX_DEPTH = 12
+  MAX_DEPTH = 16
 
   ts_len = 0
   ts_mean = 0
@@ -48,6 +48,7 @@ class Dynamic_Iterative_Player:
   def play(self, board):
     start = timer()
     self.target = start+3
+    self.overtime = False
     
     bb = bb_from(board, self.color)
     bbmove = None
@@ -55,11 +56,23 @@ class Dynamic_Iterative_Player:
     self.last_time = 0
     self.last_cost, self.last_move = None, None
     depth = 0
-    while ((self.target - timer()) > 0.1 and depth < self.MAX_DEPTH):
+    while (depth < self.MAX_DEPTH):
       depth += 1
       before = timer()
-      self.last_cost, self.last_move = self.negamax(1, depth, self.inf_neg, self.inf_pos, bb)
+      cost, move = self.negamax(1, depth, self.inf_neg, self.inf_pos, bb)
+      if self.overtime:
+        depth -= 1
+        break
+      self.last_cost, self.last_move = cost, move
       self.last_time = timer() - before
+      if abs(cost) > 9999: # endgame
+        if cost > 0:
+          print 'ganhei'
+        elif cost < 0:
+          print 'perdi'
+        else:
+          print 'empatei'
+        break 
     print "reached depth ", depth
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
@@ -69,11 +82,13 @@ class Dynamic_Iterative_Player:
   
   def negamax(self, color, depth, alpha, beta, node):
     if ((self.target - timer()) < 0.1):
-      return self.last_cost, self.last_move # cabo o tempo
-    moves = find_moves_iter(node)
+      self.overtime = True
+      return 0, None # cabo o tempo
     
-    if (len(moves) is 0):
-      if len(find_moves_iter(node.change_player_c())) != 0:
+    moves_raw = find_moves(node)
+    
+    if (not moves_raw):
+      if find_moves(node.change_player_c()):
         # Passa a vez
         otherTurn = self.negamax(-color, depth, -beta, -alpha, node.change_player_c())
         return (- otherTurn[0], otherTurn[1])
@@ -81,11 +96,12 @@ class Dynamic_Iterative_Player:
         # folha! game over!
         return h_score_final(node), None
     
-    if (depth is 0):
+    if (depth == 0):
       # folha! segue o jogo!
       return h_evaluate_dynamic(node), None
     else:
-      if len(moves) is 1:
+      moves = bits_iter(moves_raw)
+      if len(moves) == 1:
         # movimento forcado
         # aumenta 1 profundidade pro (unico) node filho
         depth += 1
@@ -100,5 +116,6 @@ class Dynamic_Iterative_Player:
         alpha = max(alpha, best[0])
         if alpha >= beta: # corta! inutil continuar!
           break;
-      return best
+        
+      return (0, None) if self.overtime else best
         
