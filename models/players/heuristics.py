@@ -456,3 +456,15 @@ def h_evaluate_dynamic_no_uns(bb):
   return val
   
   
+def h_evaluate_custom(bb, myweights):
+  move_count = bitcount(bb.me | bb.op)
+  h1 = h_movements(bb)
+  h2 = h_potential_movements_est(bb)
+  h3 = h_stability_no_unstables(bb)
+  h4 = h_corners(bb)
+  h5 = h_score(bb)
+  values = h1, h2, h3, h4, h5
+  coeffs = [exp(-(move_count-k)*(move_count-k)/400) for k in splits]
+  return sum(c * sum(v * w for v, w in zip(values, w)) for c,w in zip(coeffs,myweights))
+  
+  
