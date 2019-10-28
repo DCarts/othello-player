@@ -6,6 +6,8 @@ from models.board import Board
 ZERO = i64(0)
 ONE = i64(1)
 SIZE = i64(8)
+SIZEM1 = i64(7)
+SIZEP1 = i64(9)
 
 BB_UP = i64(0xFFFFFFFFFFFFFF00)
 BB_DOWN = i64(0x00FFFFFFFFFFFFFF)
@@ -25,13 +27,13 @@ def next_left(x):
 def next_right(x):
   return (x >> ONE) & BB_RIGHT
 def next_up_left(x):
-  return (x << (SIZE + ONE)) & BB_UP_LEFT
+  return (x << SIZEP1) & BB_UP_LEFT
 def next_up_right(x):
-  return (x << (SIZE - ONE)) & BB_UP_RIGHT
+  return (x << SIZEM1) & BB_UP_RIGHT
 def next_down_left(x):
-  return (x >> (SIZE - ONE)) & BB_DOWN_LEFT
+  return (x >> SIZEM1) & BB_DOWN_LEFT
 def next_down_right(x):
-  return (x >> (SIZE + ONE)) & BB_DOWN_RIGHT
+  return (x >> SIZEP1) & BB_DOWN_RIGHT
 
 next_move_directions = (next_up,
          next_down,
@@ -43,6 +45,7 @@ next_move_directions = (next_up,
          next_down_right)
 
 def bitcount(x):
+  """conta quantos bits '1' o numero x possui"""
   count = 0.0
   while (x):
     x &= (x-ONE)
@@ -50,6 +53,8 @@ def bitcount(x):
   return count
 
 def empty_nbors(bb):
+  """retorna as posicoes vazias vizinhas a
+    pecas minhas e pecas do inimigo"""
   me_nbors = i64(0)
   op_nbors = i64(0)
   for direction in next_move_directions:
@@ -58,6 +63,7 @@ def empty_nbors(bb):
   return me_nbors, op_nbors
 
 def find_moves(bb):
+  """acha movimentos possiveis para mim"""
   me = bb.me
   op = bb.op
   empty = bb.get_empty()
@@ -71,6 +77,7 @@ def find_moves(bb):
   return moves
 
 def bits_iter(bbn):
+  """cria um iterable para cada bit '1' da entrada"""
   bits = []
   while (bbn):
     without_lsb = bbn & (bbn-ONE)
@@ -79,9 +86,11 @@ def bits_iter(bbn):
   return bits
 
 def find_moves_iter(bb):
+  """iteravel dos movimentos possiveis para mim"""
   return bits_iter(find_moves(bb))
 
 def bbm_to_tuple(bbm):
+  """converte bit em bitboard para tupla de x, y"""
   i = 0
   j = 0
   movel = i64(bbm)
@@ -95,6 +104,7 @@ def bbm_to_tuple(bbm):
   return i, j
 
 def tuple_to_bbm(move):
+  """converte tupla de x, y para bit em bitboard"""
   bbm = i64(1) << i64(63)
   x = i64(move[0])
   y = i64(move[1])
@@ -103,6 +113,7 @@ def tuple_to_bbm(move):
   return bbm
 
 def makeBoard(bb):
+  """cria uma board da lib do victorlcampos tendo como entrada uma bitboard"""
   board = Board(None)
   moves_int_a = bb.me
   moves_a = ()
@@ -123,6 +134,7 @@ def makeBoard(bb):
   return board
 
 def print_bbn(bbn):
+  """imprime um numero 64 bits em bitboard 8x8"""
   mask = i64(1) << i64(63)
   for i in range(8):
     line = ""
@@ -132,6 +144,7 @@ def print_bbn(bbn):
     print line
 
 def print_pov(bb):
+  """imprime um tabuleiro do meu ponto de vista"""
   mask = i64(1) << i64(63)
   for i in range(8):
     line = ""
@@ -147,6 +160,7 @@ def print_pov(bb):
 
 
 class BitBoard:
+  """classe que representa uma bitboard"""
 
   def __init__(self, me, op):
     self.me = i64(me)
@@ -159,12 +173,14 @@ class BitBoard:
     return hash(self.me | self.op)
 
   def get_empty(self):
+    """retorna as posicoes vazias da bitboard"""
     return ~(self.me | self.op)
 
   def clone(self):
     return BitBoard(deepcopy(self.me), deepcopy(self.op))
 
   def play(self, move):
+    """aplica um movimento na bitboard"""
     empty = self.get_empty()
 
     for next_dir in next_move_directions:
@@ -181,20 +197,29 @@ class BitBoard:
     return self
 
   def change_player(self):
+    """troca o turno (quem vai fazer o
+       proximo movimento) da bitboard"""
     self.me, self.op = self.op, self.me
     return self
   
   def play_c(self, move):
+    """aplica um movimento numa copia da bitboard"""
     return self.clone().play(move)
 
   def change_player_c(self):
+    """troca o turno (quem vai fazer o
+       proximo movimento) numa copia da bitboard"""
     return self.clone().change_player()
 
   def fullplay_c(self, move):
+    """aplica um movimento e troca o turno
+       (quem vai fazer o proximo movimento)
+       numa copia da bitboard"""
     return self.clone().play(move).change_player()
   
 
 def bb_from(board, color):
+  """converte uma board da lib do victorlcampos em uma BitBoard"""
   me = i64(0)
   op = i64(0)
   
