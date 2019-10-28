@@ -5,9 +5,11 @@ from models.board import Board
 
 import glob
 
-class BoardController:
-  def __init__(self):
+class TestBoardController:
+  def __init__(self, white, black):
     self.board = Board(None)
+    self.white = white
+    self.black = black
     self.view  = ConsoleBoardView(self.board)
 
   def init_game(self):
@@ -23,9 +25,10 @@ class BoardController:
     self.view.update_view()
 
     while finish_game != 2:
-      raw_input("")
+      # raw_input("")
       atual_color = self.atual_player.color
       print 'Jogador: ' + atual_color
+
       if self.board.valid_moves(atual_color).__len__() > 0:
         self.board.play(self.atual_player.play(self.board.get_clone()), atual_color)
         self.view.update_view()
@@ -33,8 +36,12 @@ class BoardController:
       else:
         print 'Sem movimentos para o jogador: ' + atual_color
         finish_game += 1
+      
       self.atual_player = self._opponent(self.atual_player)
 
+    ##begin added
+    self.view.update_view()
+    ##end added
     self._end_game()
 
 
@@ -58,12 +65,8 @@ class BoardController:
 
   def _select_player(self, color):
     players = glob.glob('./models/players/*_player.py')
-    print 'Selecione um dos players abaixo para ser o jogador '+color
 
-    for idx, player in enumerate(players):
-      print idx.__str__() + " - " + player
-
-    player = raw_input("Digite o numero do player que voce deseja: ")
+    player = self.white if color == Board.WHITE else self.black
     module_globals = {}
     execfile(players[int(player)], module_globals)
     print module_globals.keys()
