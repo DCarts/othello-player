@@ -269,5 +269,14 @@ def h_evaluate_custom(bb, myweights):
   values = h1, h2, h3, h4, h5
   coeffs = [exp(-(move_count-k)*(move_count-k)/400) for k in splits]
   return sum(c * sum(v * w for v, w in zip(values, w)) for c,w in zip(coeffs,myweights))
+
+def h_evaluate_custom_noscore(bb, myweights):
+  move_count = bitcount(bb.me | bb.op)
+  values = (h_movements(bb),
+            h_potential_movements_est(bb),
+            h_stability_no_unstables(bb),
+            h_corners(bb))
+  coeffs = [exp(-(move_count-k)*(move_count-k)/400) for k in splits]
+  return sum(c * sum(v * w for v, w in zip(values, w)) for c,w in zip(coeffs,myweights))
   
   

@@ -11,9 +11,9 @@ class Custom2NegascoutPlayer:
 
   t_table = dict()
 
-  myweights = ((60.0, 35.0,  0.0,  5.0,  0.0),
-               ( 5.0, 10.0, 45.0, 40.0,  0.0),
-               (20.0,  0.0, 55.0, 25.0,  0.0))
+  myweights = ((60.0, 35.0,  0.0,  5.0),
+               ( 5.0, 10.0, 45.0, 40.0),
+               (20.0,  0.0, 55.0, 25.0))
 
   name = "2"
   
@@ -109,7 +109,7 @@ class Custom2NegascoutPlayer:
     
     if (depth == 0):
       # horizonte da busca! folha! segue o jogo!
-      score = h_evaluate_custom(node, self.myweights)
+      score = h_evaluate_custom_noscore(node, self.myweights)
       self.t_table[node] = score, None, depth
       return score, None
     else:
