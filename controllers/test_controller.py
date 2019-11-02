@@ -11,6 +11,7 @@ class TestBoardController:
     self.white = white
     self.black = black
     self.view  = ConsoleBoardView(self.board)
+    self.win = 0
 
   def init_game(self):
 
@@ -43,16 +44,21 @@ class TestBoardController:
     self.view.update_view()
     ##end added
     self._end_game()
+    return self.win
 
+  def _score(self):
+    return self.board.score()
 
   def _end_game(self):
     score = self.board.score()
     if score[0] > score[1]:
       print ""
       print 'Jogador ' + self.white_player.__class__.__name__ + '('+Board.WHITE+') Ganhou'
+      self.win = 1
     elif score[0] < score[1]:
       print ""
       print 'Jogador ' + self.black_player.__class__.__name__ + '('+Board.BLACK+') Ganhou'
+      self.win = 2
     else:
       print ""
       print 'Jogo terminou empatado'

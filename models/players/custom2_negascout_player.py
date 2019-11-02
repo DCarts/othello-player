@@ -52,9 +52,9 @@ class Custom2NegascoutPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Custom", self.name, "negascout last:", last
-    print "Custom", self.name, "negascout mean:", self.ts_mean
-    print "Custom", self.name, "negascout max:", self.ts_max
+    # print "Custom", self.name, "negascout last:", last
+    # print "Custom", self.name, "negascout mean:", self.ts_mean
+    # print "Custom", self.name, "negascout max:", self.ts_max
 
   def play(self, board):
     start = timer()

@@ -52,9 +52,9 @@ class Custom1NegascoutPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Custom", self.name, "negascout last:", last
-    print "Custom", self.name, "negascout mean:", self.ts_mean
-    print "Custom", self.name, "negascout max:", self.ts_max
+    # print "Custom", self.name, "negascout last:", last
+    # print "Custom", self.name, "negascout mean:", self.ts_mean
+    # print "Custom", self.name, "negascout max:", self.ts_max
 
   def play(self, board):
     start = timer()
@@ -62,6 +62,7 @@ class Custom1NegascoutPlayer:
     self.overtime = False
     
     bb = bb_from(board, self.color)
+    # print bb
     bbmove = None
     
     self.last_time = 0
@@ -79,9 +80,10 @@ class Custom1NegascoutPlayer:
         break
       self.last_time = timer() - before
     print "reached depth ", depth
+    print Move(*bbm_to_tuple(self.last_move))
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
-    self.update_time(end-start)
+    self.update_time(end-start)    
     return next_move
 
   
@@ -121,11 +123,19 @@ class Custom1NegascoutPlayer:
 
       # ordenando movimentos por custo avaliado pela busca de profundidade com profundidade 1/2 da que queremos (shallow)
       current_boards = [(node.fullplay_c(move), move) for move in moves]
-      current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depth // 2, -beta, -alpha, x[0])[0])
+      depthShall = depth // 2
+      if(depthShall > 1):
+        current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, 2, -beta, -alpha, x[0])[0])
+      else:
+        current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depthShall, -beta, -alpha, x[0])[0])
       
       last_best = current_boards[0][0]
       best = (self.inf_neg, moves[0])
-      for current, move in current_boards:
+      # if(len(current_boards) > 3):
+      #   print "test"
+      #   print len(current_boards)
+      #   print current_boards[:3]
+      for current, move in current_boards[:3]:
         # negascout
         if current == last_best:
           score = -self.negascout(-color, depth-1, -beta, -alpha, current)[0], move
