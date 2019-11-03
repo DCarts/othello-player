@@ -1,24 +1,78 @@
-from controllers.test_controller  import TestBoardController
+from controllers.test_controller_hill  import TestBoardControllerHill
 from models.move                  import Move
 from models.board                 import Board
 import pstats
 import cProfile
+from random import seed
+from random import randint
+import copy
+mismaLinea = 0
+q1 = 1
+pesoAntes = [[57.0, 32.0, 9.0, 2.0], [-4.0, 1.0, 60.0, 43.0], [17.0, -3.0, 64.0, 22.0]]
+pesoDepois = [[57.0, 32.0, 9.0, 2.0], [-7.0, -2.0, 57.0, 52.0], [17.0, -3.0, 64.0, 22.0]]
+peso1 = [0, 0]
+peso2 = [0, 0]
+ganhadas1 = [4, 1]
+ganhadas2 = [2, 3]
+mexer = 1
 
-me = 0
-ele = 0
-for x in xrange(0,18):
-        if(x != 7):
-                controller = TestBoardController(x,1)
-	# controller.init_game()
-	# def doit():
-	#   p = pstats.Stats('pstats')
-	#   p.sort_stats('cumulative').print_stats(30)
-	#   p.sort_stats('time').print_stats(100)
-	# cProfile.run('controller.init_game()', 'pstats')
+for x in xrange(0,0):
+        controller = TestBoardControllerHill(4,0,pesoAntes)        
         win = controller.init_game()
+        score = controller._score()        
+        peso1[0] += score[0]
+        peso1[1] += score[1]
         if(win == 1):
-                ele += 1
+                ganhadas1[0] += 1
         elif(win == 2):
-                me += 1
-        print 'doit!'
-print me, ele
+                ganhadas1[1] += 1
+print "Inicio", "/",
+print pesoAntes,
+print ganhadas1,"/",
+print peso1
+tent = 0
+while(1):
+        if(4 > ganhadas2[0]):
+                mismaLinea += 1
+                pesoDepois[q1] = copy.copy(pesoAntes[q1])
+                mexer = randint(0, 3)
+                print mexer
+        else:
+                mismaLinea = 0
+                pesoAntes[q1] = copy.copy(pesoDepois[q1])
+                ganhadas1 = copy.copy(ganhadas2)
+                print "nao mexer"
+        if(mismaLinea == 3):
+                mismaLinea = 0
+                q1 += 1
+                q1 = q1%3
+        for x in xrange(0,4):
+                if(x == mexer):
+                        pesoDepois[q1][x] += 9.0
+                else:
+                        pesoDepois[q1][x] -= 3.0
+        peso2 = [0,0]
+        ganhadas2 = [0,0]
+        print "tentativa", tent, "/",
+        print pesoDepois
+        for x in xrange(0,5):
+                controller = TestBoardControllerHill(4,0,pesoDepois)        
+                win = controller.init_game()
+                score = controller._score()
+                peso2[0] += score[0]
+                peso2[1] += score[1]
+                if(win == 1):
+                        ganhadas2[0] += 1
+                elif(win == 2):
+                        ganhadas2[1] += 1
+        print "Resultado", tent, "/",
+        print ganhadas2,"/",
+        print peso2
+        tent += 1
+                        
+        
+                
+                
+                
+        
+

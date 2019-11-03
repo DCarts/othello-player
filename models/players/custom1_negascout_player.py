@@ -11,9 +11,9 @@ class Custom1NegascoutPlayer:
 
   t_table = dict()
 
-  myweights = ((60.0, 35.0,  0.0,  5.0),
-               ( 5.0, 10.0, 45.0, 40.0),
-               (20.0,  0.0, 55.0, 25.0))
+  myweights = ((75.0, 26.0, -9.0, 8.0),
+               (-7.0, 22.0, 45.0, 40.0),
+               (20.0, 0.0, 55.0, 25.0))
 
   name = "1"
   
@@ -79,8 +79,8 @@ class Custom1NegascoutPlayer:
       if abs(cost) > 9998: # endgame
         break
       self.last_time = timer() - before
-    print "reached depth ", depth
-    print Move(*bbm_to_tuple(self.last_move))
+    # print "reached depth ", depth
+    # print Move(*bbm_to_tuple(self.last_move))
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
     self.update_time(end-start)    
@@ -124,10 +124,10 @@ class Custom1NegascoutPlayer:
       # ordenando movimentos por custo avaliado pela busca de profundidade com profundidade 1/2 da que queremos (shallow)
       current_boards = [(node.fullplay_c(move), move) for move in moves]
       depthShall = depth // 2
-      if(depthShall > 1):
-        current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, 2, -beta, -alpha, x[0])[0])
-      else:
-        current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depthShall, -beta, -alpha, x[0])[0])
+      # if(depthShall > 1):
+        # current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, 2, -beta, -alpha, x[0])[0])
+      # else:
+      current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depthShall, -beta, -alpha, x[0])[0])
       
       last_best = current_boards[0][0]
       best = (self.inf_neg, moves[0])

@@ -1,7 +1,7 @@
 import requests	
 
 class ChinoPlayer:
-  def __init__(self, color):
+  def __init__(self, color,p1,p2,p3):
     self.color = color
 
   def play(self, board):
@@ -12,6 +12,7 @@ class ChinoPlayer:
     for move in moves:
     	# print move.x,move.y
     	if(move.x == (movchino // 9) and move.y == (movchino % 9)):
+    		# print "chino", move
     		return move
 
 
@@ -19,8 +20,8 @@ class ChinoPlayer:
     url = self.stringBoard(board,self.color)
     r = requests.get(url)
     mov = int(r.text)
-    print url
-    print mov
+    # print url
+    # print mov
     return mov
 
   def stringBoard(self,board,color):

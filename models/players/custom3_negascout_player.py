@@ -15,9 +15,9 @@ class Custom3NegascoutPlayer:
                ( 5.0, 10.0, 45.0, 40.0),
                (20.0,  0.0, 55.0, 25.0))
 
-  name = "3"
+  name = "1"
   
-  def __init__(self, color):
+  def __init__(self, color,p1,p2,p3):
     self.color = color
     self.fixImports()
     self.dangerous_raw = i64(0)
@@ -29,6 +29,7 @@ class Custom3NegascoutPlayer:
                       ONE << i64(49),
                       ONE << i64(14),
                       ONE << i64(9))
+    self.myweights = (tuple(p1), tuple(p2), tuple(p3))
     for at in self.dangerous[4:]:
       self.dangerous_raw |= at
     
@@ -52,9 +53,9 @@ class Custom3NegascoutPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Custom", self.name, "negascout last:", last
-    print "Custom", self.name, "negascout mean:", self.ts_mean
-    print "Custom", self.name, "negascout max:", self.ts_max
+    # print "Custom", self.name, "negascout last:", last
+    # print "Custom", self.name, "negascout mean:", self.ts_mean
+    # print "Custom", self.name, "negascout max:", self.ts_max
 
   def play(self, board):
     start = timer()
@@ -62,6 +63,7 @@ class Custom3NegascoutPlayer:
     self.overtime = False
     
     bb = bb_from(board, self.color)
+    # print bb
     bbmove = None
     
     self.last_time = 0
@@ -78,10 +80,11 @@ class Custom3NegascoutPlayer:
       if abs(cost) > 9998: # endgame
         break
       self.last_time = timer() - before
-    print "reached depth ", depth
+    # print "reached depth ", depth
+    # print Move(*bbm_to_tuple(self.last_move))
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
-    self.update_time(end-start)
+    self.update_time(end-start)    
     return next_move
 
   
@@ -121,11 +124,19 @@ class Custom3NegascoutPlayer:
 
       # ordenando movimentos por custo avaliado pela busca de profundidade com profundidade 1/2 da que queremos (shallow)
       current_boards = [(node.fullplay_c(move), move) for move in moves]
-      current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depth // 2, -beta, -alpha, x[0])[0])
+      depthShall = depth // 2
+      # if(depthShall > 1):
+        # current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, 2, -beta, -alpha, x[0])[0])
+      # else:
+      current_boards.sort(reverse = True, key = lambda x: -self.negascout(-color, depthShall, -beta, -alpha, x[0])[0])
       
       last_best = current_boards[0][0]
       best = (self.inf_neg, moves[0])
-      for current, move in current_boards:
+      # if(len(current_boards) > 3):
+      #   print "test"
+      #   print len(current_boards)
+      #   print current_boards[:3]
+      for current, move in current_boards[:3]:
         # negascout
         if current == last_best:
           score = -self.negascout(-color, depth-1, -beta, -alpha, current)[0], move
@@ -149,4 +160,3 @@ class Custom3NegascoutPlayer:
         # salva o valor e movimento que calculamos e retorna
         self.t_table[node] = best[0], best[1], depth 
         return best
-        
