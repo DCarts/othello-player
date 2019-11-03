@@ -11,9 +11,15 @@ class Custom1NegascoutPlayer:
 
   t_table = dict()
 
-  myweights = ((75.0, 26.0, -9.0, 8.0),
+  myweightsBranca = ((54.0, 41.0, -6.0, 11.0),
+               (-4.0, 1.0, 60.0, 43.0),
+               (14.0, -6.0, 73.0, 19.0))
+
+  myweightsPreta = ((75.0, 26.0, -9.0, 8.0),
                (-7.0, 22.0, 45.0, 40.0),
-               (20.0, 0.0, 55.0, 25.0))
+               (14.0, -6.0, 61.0, 31.0))
+
+  myweights = ()
 
   name = "1"
   
@@ -31,6 +37,10 @@ class Custom1NegascoutPlayer:
                       ONE << i64(9))
     for at in self.dangerous[4:]:
       self.dangerous_raw |= at
+      if(color == '@'):
+        self.myweights = self.myweightsPreta
+      elif(color == 'o'):
+        self.myweights = self.myweightsBranca
     
   def fixImports(self):
     bb_globals = {}
@@ -111,6 +121,7 @@ class Custom1NegascoutPlayer:
     
     if (depth == 0):
       # horizonte da busca! folha! segue o jogo!
+      # print self.myweights
       score = h_evaluate_custom_noscore(node, self.myweights)
       self.t_table[node] = score, None, depth
       return score, None

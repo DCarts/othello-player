@@ -9,8 +9,8 @@ bj = ""
 preto = 0
 nj = ""
 peso = [0,0]
-for x in xrange(0,5):
-        controller = TestBoardController(3,2)        
+for x in xrange(0,16):
+        controller = TestBoardController(2,3)        
 	# controller.init_game()
 	# def doit():
 	#   p = pstats.Stats('pstats')
