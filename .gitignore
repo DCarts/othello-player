@@ -1,3 +1,4 @@
 *.pyc
 *.bak
-
+.pstats
+__pycache__
