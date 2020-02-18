@@ -1,6 +1,6 @@
 # -*- coding: cp1252 -*-
-from models.players.bitboard import *
-from views.console_board_view import ConsoleBoardView
+from .models.players.bitboard import *
+from .views.console_board_view import ConsoleBoardView
 from math import exp
 from numpy import uint64 as i64
 from timeit import default_timer as timer
@@ -25,7 +25,7 @@ THREE = i64(3)
 
 def print_mask(m):
   for x in ['{0:064b}'.format(m)[i:i+8] for i in range(0, 64, 8)]:
-    print x
+    print(x)
 
 masks = None
 masks_dirs = None
@@ -44,23 +44,23 @@ def precalc_mask_stability():
       if ((at | mask_t_corners) == mask_t_corners):
         mymasks[at] = at
         mymasks_dirs[at] = tuple()
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
       elif ((at | mask_t_up) == mask_t_up):
         mymasks[at] = i64(0xFF00000000000000)
         mymasks_dirs[at] = ((mask_h << (i << THREE)) & ~(at-ONE), (mask_h << (i << THREE)) & (at-ONE)),
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
       elif ((at | mask_t_left) == mask_t_left):
         mymasks[at] = i64(0x8080808080808080)
         mymasks_dirs[at] = ((mask_v << j) & ~(at-ONE), (mask_v << j) & (at-ONE)),
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
       elif ((at | mask_t_right) == mask_t_right):
         mymasks[at] = i64(0x0101010101010101)
         mymasks_dirs[at] = ((mask_v << j) & ~(at-ONE), (mask_v << j) & (at-ONE)),
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
       elif ((at | mask_t_down) == mask_t_down):
         mymasks[at] = i64(0x00000000000000FF)
         mymasks_dirs[at] = ((mask_h << (i << THREE)) & ~(at-ONE), (mask_h << (i << THREE)) & (at-ONE)),
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
       else:
         mask_ij = (mask_h << (i << THREE)) | (mask_v << j)
         mymasks_dirs[at] = ((mask_h << (i << THREE)) & ~(at-ONE), (mask_h << (i << THREE)) & (at-ONE)), ((mask_v << j) & ~(at-ONE), (mask_v << j) & (at-ONE))
@@ -77,7 +77,7 @@ def precalc_mask_stability():
         else:
           mask_ij |= (mask_d2 << ((j - d) << THREE))
           mymasks_dirs[at] += ((mask_d2 << ((j - d) << THREE)) & ~(at-ONE), (mask_d2 << ((j - d) << THREE)) & (at-ONE)),
-        print mymasks_dirs[at]
+        print(mymasks_dirs[at])
         mymasks[at] = mask_ij
 
   return mymasks, mymasks_dirs
@@ -86,9 +86,9 @@ masks, masks_dirs = precalc_mask_stability()
 
 bb_test = BitBoard(0xD0A1E269930337D3,0x204000846870C820)
 print_mask(bb_test.me)
-print '' 
+print('') 
 print_mask(bb_test.op)
-print ''
+print('')
 
 
 

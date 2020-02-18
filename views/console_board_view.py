@@ -3,4 +3,4 @@ class ConsoleBoardView:
     self.board = board
 
   def update_view(self):
-    print self.board
+    print(self.board)

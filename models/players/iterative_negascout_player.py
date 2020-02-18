@@ -26,8 +26,8 @@ class Iterative_Negascout_Player:
   def fixImports(self):
     bb_globals = {}
     h_globals = {}
-    execfile('./models/players/bitboard.py', bb_globals)
-    execfile('./models/players/heuristics.py', h_globals)
+    exec(compile(open('./models/players/bitboard.py', "rb").read(), './models/players/bitboard.py', 'exec'), bb_globals)
+    exec(compile(open('./models/players/heuristics.py', "rb").read(), './models/players/heuristics.py', 'exec'), h_globals)
     globals().update(bb_globals)
     globals().update(h_globals)
     global itemgetter
@@ -43,9 +43,9 @@ class Iterative_Negascout_Player:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Iterative negascout last: ", last
-    print "Iterative negascout mean: ", self.ts_mean
-    print "Iterative negascout max: ", self.ts_max
+    print("Iterative negascout last: ", last)
+    print("Iterative negascout mean: ", self.ts_mean)
+    print("Iterative negascout max: ", self.ts_max)
 
   def play(self, board):
     start = timer()
@@ -69,13 +69,13 @@ class Iterative_Negascout_Player:
       self.last_time = timer() - before
       if abs(cost) > 9999: # endgame
         if cost > 0:
-          print 'ganhei'
+          print('ganhei')
         elif cost < 0:
-          print 'perdi'
+          print('perdi')
         else:
-          print 'empatei'
+          print('empatei')
         break 
-    print "reached depth ", depth
+    print("reached depth ", depth)
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
     self.update_time(end-start)

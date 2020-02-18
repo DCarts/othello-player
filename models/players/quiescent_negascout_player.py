@@ -35,8 +35,8 @@ class CustomQuiescentNegascoutPlayer:
   def fixImports(self):
     bb_globals = {}
     h_globals = {}
-    execfile('./models/players/bitboard.py', bb_globals)
-    execfile('./models/players/heuristics.py', h_globals)
+    exec(compile(open('./models/players/bitboard.py', "rb").read(), './models/players/bitboard.py', 'exec'), bb_globals)
+    exec(compile(open('./models/players/heuristics.py', "rb").read(), './models/players/heuristics.py', 'exec'), h_globals)
     globals().update(bb_globals)
     globals().update(h_globals)
     global itemgetter
@@ -52,9 +52,9 @@ class CustomQuiescentNegascoutPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "Custom", self.name, "negascout last:", last
-    print "Custom", self.name, "negascout mean:", self.ts_mean
-    print "Custom", self.name, "negascout max:", self.ts_max
+    print("Custom", self.name, "negascout last:", last)
+    print("Custom", self.name, "negascout mean:", self.ts_mean)
+    print("Custom", self.name, "negascout max:", self.ts_max)
 
   def play(self, board):
     start = timer()
@@ -78,7 +78,7 @@ class CustomQuiescentNegascoutPlayer:
       if abs(cost) > 9998: # endgame
         break
       self.last_time = timer() - before
-    print "reached depth ", depth
+    print("reached depth ", depth)
     next_move = Move(*bbm_to_tuple(self.last_move))
     end = timer()
     self.update_time(end-start)

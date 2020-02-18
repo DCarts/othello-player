@@ -75,7 +75,7 @@ class Board:
 
 
   def _squares(self):
-    return [i for i in xrange(11, 89) if 1 <= (i % 10) <= 8]
+    return [i for i in range(11, 89) if 1 <= (i % 10) <= 8]
 
   def _reverse(self, move, color):
     for direction in Board.DIRECTIONS:

@@ -60,7 +60,7 @@ def print_bbn(bbn):
     for j in range(8):
       line += ("1" if bbn & mask else "0")
       mask >>= i64(1)
-    print line
+    print(line)
 
 def print_pov(bb):
   """imprime um tabuleiro do meu ponto de vista"""
@@ -75,7 +75,7 @@ def print_pov(bb):
       else:
         line += '.'
       mask >>= i64(1)
-    print line
+    print(line)
 
 def bitcount(x):
   """conta quantos bits '1' o numero x possui"""

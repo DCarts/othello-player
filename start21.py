@@ -1,6 +1,6 @@
-from controllers.test_controller  import TestBoardController
-from models.move                  import Move
-from models.board                 import Board
+from .controllers.test_controller  import TestBoardController
+from .models.move                  import Move
+from .models.board                 import Board
 import pstats
 import cProfile
 
@@ -9,7 +9,7 @@ bj = ""
 preto = 0
 nj = ""
 peso = [0,0]
-for x in xrange(0,16):
+for x in range(0,16):
         controller = TestBoardController(3,2)        
 	# controller.init_game()
 	# def doit():
@@ -29,7 +29,7 @@ for x in xrange(0,16):
         #Ganha Negra
         elif(win == 2):
                 preto += 1
-        print 'doit!'
-        print peso        
-print bj, nj
-print branco, preto
+        print('doit!')
+        print(peso)        
+print(bj, nj)
+print(branco, preto)

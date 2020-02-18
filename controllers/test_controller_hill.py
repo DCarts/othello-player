@@ -54,16 +54,16 @@ class TestBoardControllerHill:
   def _end_game(self):
     score = self.board.score()
     if score[0] > score[1]:
-      print ""
-      print 'Jogador ' + self.white_player.__class__.__name__ + '('+Board.WHITE+') Ganhou'
+      print("")
+      print('Jogador ' + self.white_player.__class__.__name__ + '('+Board.WHITE+') Ganhou')
       self.win = 1
     elif score[0] < score[1]:
-      print ""
-      print 'Jogador ' + self.black_player.__class__.__name__ + '('+Board.BLACK+') Ganhou'
+      print("")
+      print('Jogador ' + self.black_player.__class__.__name__ + '('+Board.BLACK+') Ganhou')
       self.win = 2
     else:
-      print ""
-      print 'Jogo terminou empatado'
+      print("")
+      print('Jogo terminou empatado')
 
   def _opponent(self, player):
     if player.color == Board.WHITE:
@@ -76,6 +76,6 @@ class TestBoardControllerHill:
 
     player = self.white if color == Board.WHITE else self.black
     module_globals = {}
-    execfile(players[int(player)], module_globals)
-    print module_globals.keys()
-    return module_globals[module_globals.keys()[len(module_globals.keys()) - 1]](color,self.p1,self.p2,self.p3)
+    exec(compile(open(players[int(player)], "rb").read(), players[int(player)], 'exec'), module_globals)
+    print(list(module_globals.keys()))
+    return module_globals[list(module_globals.keys())[len(list(module_globals.keys())) - 1]](color,self.p1,self.p2,self.p3)

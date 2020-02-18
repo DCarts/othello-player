@@ -23,9 +23,9 @@ class NegamaxABPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "NegaMax Alpha-Beta last: ", last
-    print "NegaMax Alpha-Beta mean: ", self.ts_mean
-    print "NegaMax Alpha-Beta max: ", self.ts_max
+    print("NegaMax Alpha-Beta last: ", last)
+    print("NegaMax Alpha-Beta mean: ", self.ts_mean)
+    print("NegaMax Alpha-Beta max: ", self.ts_max)
 
   def play(self, board):
     start = self.timer()

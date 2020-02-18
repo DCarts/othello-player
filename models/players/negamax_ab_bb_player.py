@@ -20,8 +20,8 @@ class Negamax_AB_BB_Player:
   def fixImports(self):
     bb_globals = {}
     h_globals = {}
-    execfile('./models/players/bitboard.py', bb_globals)
-    execfile('./models/players/heuristics.py', h_globals)
+    exec(compile(open('./models/players/bitboard.py', "rb").read(), './models/players/bitboard.py', 'exec'), bb_globals)
+    exec(compile(open('./models/players/heuristics.py', "rb").read(), './models/players/heuristics.py', 'exec'), h_globals)
     globals().update(bb_globals)
     globals().update(h_globals)
     global itemgetter
@@ -37,9 +37,9 @@ class Negamax_AB_BB_Player:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "NegaMax Alpha-Beta with BitBoard last: ", last
-    print "NegaMax Alpha-Beta with BitBoard mean: ", self.ts_mean
-    print "NegaMax Alpha-Beta with BitBoard max: ", self.ts_max
+    print("NegaMax Alpha-Beta with BitBoard last: ", last)
+    print("NegaMax Alpha-Beta with BitBoard mean: ", self.ts_mean)
+    print("NegaMax Alpha-Beta with BitBoard max: ", self.ts_max)
 
   def play(self, board):
     start = timer()

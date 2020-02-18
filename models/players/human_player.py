@@ -5,13 +5,13 @@ class HumanPlayer:
 
 
   def play(self, board):
-    rowInp = int(raw_input("Linha: "))
-    colInp = int(raw_input("Coluna: "))
+    rowInp = int(input("Linha: "))
+    colInp = int(input("Coluna: "))
     move = Move(rowInp, colInp)
     while move not in board.valid_moves(self.color):
-      print "Movimento invalido.Insira um valido"
-      print board
-      rowInp = int(raw_input("Linha: "))
-      colInp = int(raw_input("Coluna: "))
+      print("Movimento invalido.Insira um valido")
+      print(board)
+      rowInp = int(input("Linha: "))
+      colInp = int(input("Coluna: "))
       move = Move(rowInp, colInp)
     return move

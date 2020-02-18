@@ -60,8 +60,8 @@ class Custom1NegascoutPlayer:
   def fixImports(self):
     bb_globals = {}
     h_globals = {}
-    execfile('./models/players/bitboard.py', bb_globals)
-    execfile('./models/players/heuristics.py', h_globals)
+    exec(compile(open('./models/players/bitboard.py', "rb").read(), './models/players/bitboard.py', 'exec'), bb_globals)
+    exec(compile(open('./models/players/heuristics.py', "rb").read(), './models/players/heuristics.py', 'exec'), h_globals)
     globals().update(bb_globals)
     globals().update(h_globals)
     global itemgetter

@@ -1,6 +1,6 @@
-from controllers.test_controller_hill  import TestBoardControllerHill
-from models.move                  import Move
-from models.board                 import Board
+from .controllers.test_controller_hill  import TestBoardControllerHill
+from .models.move                  import Move
+from .models.board                 import Board
 import pstats
 import cProfile
 from random import seed
@@ -16,7 +16,7 @@ ganhadas1 = [1, 4]
 ganhadas2 = [3, 2]
 mexer = 2
 
-for x in xrange(0,0):
+for x in range(0,0):
         controller = TestBoardControllerHill(0,4,pesoAntes)        
         win = controller.init_game()
         score = controller._score()        
@@ -26,36 +26,36 @@ for x in xrange(0,0):
                 ganhadas1[0] += 1
         elif(win == 2):
                 ganhadas1[1] += 1
-print "Inicio", "/",
-print pesoAntes,
-print ganhadas1,"/",
-print peso1
+print("Inicio", "/", end=' ')
+print(pesoAntes, end=' ')
+print(ganhadas1,"/", end=' ')
+print(peso1)
 tent = 0
 while(1):
         if(4 > ganhadas2[1]):
                 mismaLinea += 1
                 pesoDepois[q1] = copy.copy(pesoAntes[q1])
                 mexer = randint(0, 3)
-                print mexer
+                print(mexer)
         else:
                 mismaLinea = 0
                 pesoAntes[q1] = copy.copy(pesoDepois[q1])
                 ganhadas1 = copy.copy(ganhadas2)
-                print "nao mexer"
+                print("nao mexer")
         if(mismaLinea == 3):
                 mismaLinea = 0
                 q1 += 1
                 q1 = q1%3
-        for x in xrange(0,4):
+        for x in range(0,4):
                 if(x == mexer):
                         pesoDepois[q1][x] += 9.0
                 else:
                         pesoDepois[q1][x] -= 3.0
         peso2 = [0,0]
         ganhadas2 = [0,0]
-        print "tentativa", tent, "/",
-        print pesoDepois
-        for x in xrange(0,5):
+        print("tentativa", tent, "/", end=' ')
+        print(pesoDepois)
+        for x in range(0,5):
                 controller = TestBoardControllerHill(0,4,pesoDepois)        
                 win = controller.init_game()
                 score = controller._score()
@@ -65,9 +65,9 @@ while(1):
                         ganhadas2[0] += 1
                 elif(win == 2):
                         ganhadas2[1] += 1
-        print "Resultado", tent, "/",
-        print ganhadas2,"/",
-        print peso2
+        print("Resultado", tent, "/", end=' ')
+        print(ganhadas2,"/", end=' ')
+        print(peso2)
         tent += 1
                         
         

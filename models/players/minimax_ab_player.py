@@ -21,9 +21,9 @@ class MinimaxABPlayer:
     self.ts_len += 1
     self.ts_mean = (self.ts_len-1)*self.ts_mean/self.ts_len + last/self.ts_len
     self.ts_max = max(self.ts_max, last)
-    print "MiniMax Alpha-Beta last: ", last
-    print "MiniMax Alpha-Beta mean: ", self.ts_mean
-    print "MiniMax Alpha-Beta max: ", self.ts_max
+    print("MiniMax Alpha-Beta last: ", last)
+    print("MiniMax Alpha-Beta mean: ", self.ts_mean)
+    print("MiniMax Alpha-Beta max: ", self.ts_max)
 
   def play(self, board):
     start = self.timer()

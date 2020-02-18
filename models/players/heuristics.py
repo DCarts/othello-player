@@ -25,7 +25,7 @@ THREE = i64(3)
 
 def print_mask(m):
   for x in ['{0:064b}'.format(m)[i:i+8] for i in range(0, 64, 8)]:
-    print x
+    print(x)
 
 masks = None
 masks_dirs = None
